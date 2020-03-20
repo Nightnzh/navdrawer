@@ -6,17 +6,22 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.night.navdrawer.R;
 
 
@@ -27,6 +32,8 @@ public class ScannerFragment extends Fragment {
     private int RE_CAMERA = 200;
     private SurfaceView surfaceView;
     private TextView textView_info;
+    private CameraSource cameraSource;
+    private BarcodeDetector barcodeDetector;
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -36,7 +43,30 @@ public class ScannerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment_scanner, container, false);
+        View root = inflater.inflate(R.layout.fragment_scanner, container, false);
+        surfaceView = root.findViewById(R.id.surfaceView_camera);
+        textView_info = root.findViewById(R.id.textView_info);
+        barcodeDetector = new BarcodeDetector.Builder(this.getContext())
+                .setBarcodeFormats(Barcode.QR_CODE).build();
+        cameraSource = new CameraSource.Builder(this.getContext(),barcodeDetector)
+                .setRequestedPreviewSize(300,300).build();
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                cameraSource.stop();
+            }
+        });
+        return root;
     }
 
     @Override
@@ -69,5 +99,6 @@ public class ScannerFragment extends Fragment {
             return false;
         }
     }
-
 }
+
+//https://www.ruyut.com/2018/12/5-android-studio-qr-code.html
