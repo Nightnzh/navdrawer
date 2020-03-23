@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
     <group android:checkableBehavior="single">
         <item
@@ -19,5 +20,19 @@
             android:id="@+id/nav_scanner"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/menu_scanner"/>
+        <item
+            android:id="@+id/nav_scanner2"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/menu_scanner2"/>
     </group>
+    <item
+        android:title="@string/tester">
+        <menu>
+            <item
+                android:id="@+id/nav_tester"
+                android:title="@string/tester"
+                app:actionLayout="@layout/layout_switch_test">
+            </item>
+        </menu>
+    </item>
 </menu>

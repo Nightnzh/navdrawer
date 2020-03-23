@@ -117,6 +117,7 @@ public class ScannerFragment extends Fragment {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG,"cameraSource.stop()");
                 cameraSource.stop();
             }
         });
@@ -135,7 +136,6 @@ public class ScannerFragment extends Fragment {
                         @Override
                         public void run() {
                             textView_info.setText(qrCodes.valueAt(0).displayValue);
-                            Log.d(TAG,"receiveDetections");
                         }
                     });
                 }
