@@ -2,16 +2,17 @@ package com.night.navdrawer.ui.scanner;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,9 +27,11 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.night.navdrawer.R;
+import com.night.navdrawer.model.QrCode;
 
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ScannerFragment extends Fragment {
@@ -42,6 +45,9 @@ public class ScannerFragment extends Fragment {
     private String TAG = Scanner.class.getSimpleName();
     private View view;
     private FragmentManager fragmentManager;
+    private com.night.navdrawer.camera.Scanner scanner;
+    private RecyclerView recyclerView;
+    private Radapter adapter;
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -50,27 +56,29 @@ public class ScannerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        mViewModel = ViewModelProviders.of(requireActivity()).get(ScannerViewModel.class);
         fragmentManager = getFragmentManager();
         view = inflater.inflate(R.layout.fragment_scanner, container, false);
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),Manifest.permission.CAMERA)){
-
-            }else {
-                requestPermissions(new String[]{Manifest.permission.CAMERA},RE_CAMERA);
-                //ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.CAMERA},RE_CAMERA);
+        recyclerView = view.findViewById(R.id.recycler);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.requireContext()));
+        adapter = new Radapter(requireContext());
+        recyclerView.setAdapter(adapter);
+        mViewModel.getAllQrCodes().observe(getViewLifecycleOwner(), new Observer<List<QrCode>>() {
+            @Override
+            public void onChanged(List<QrCode> qrCodes) {
+                adapter.setQrCodes(qrCodes);
             }
-        } else {
-            initCamera(view);
-        }
+        });
+
+        
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(ScannerViewModel.class);
+
     }
 
     @Override
@@ -87,9 +95,11 @@ public class ScannerFragment extends Fragment {
         }
     }
 
+
+
     private void initCamera(View root) {
         surfaceView = root.findViewById(R.id.surfaceView_camera);
-        textView_info = root.findViewById(R.id.textView_info);
+        //textView_info = root.findViewById(R.id.textView_info);
         barcodeDetector = new BarcodeDetector.Builder(requireContext())
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();

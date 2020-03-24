@@ -1,9 +1,13 @@
 package com.night.navdrawer.camera;
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceControl;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -19,11 +23,14 @@ public class Scanner {
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
+    private String TAG = Scanner.class.getSimpleName();
 
     public Scanner(Context context){
+        Log.d(TAG,"ScannerCon");
         this.context = context;
     }
-    public void init(){
+    public void init(View view,int surfaceViewId){
+        Log.d(TAG,"init");
         barcodeDetector = new BarcodeDetector.Builder(context)
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();
@@ -32,6 +39,11 @@ public class Scanner {
                 .setAutoFocusEnabled(true)
                 .setRequestedPreviewSize(800,600)
                 .build();
+        surfaceView = new SurfaceView(context);
+    }
+
+    public void start(){
+        Log.d(TAG,"ScannerCon start");
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
@@ -42,7 +54,7 @@ public class Scanner {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> qrCodes = detections.getDetectedItems();
                 if (qrCodes.size()!=0){
-
+                    Log.d(TAG,qrCodes.valueAt(0).toString());
                 }
             }
         });
